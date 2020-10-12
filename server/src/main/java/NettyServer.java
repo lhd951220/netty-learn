@@ -1,3 +1,6 @@
+import com.lhd.login.LifeCyCleTestHandler;
+import com.lhd.login.LoginRequestHandler;
+import com.lhd.login.MessageRequestHandler;
 import com.lhd.login.ServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFutureListener;
@@ -5,6 +8,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import packet.PacketDecoder;
+import packet.PacketEncoder;
 
 /**
  * @author Haidong Liu
@@ -23,7 +28,12 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel ssc) throws Exception {
-                        ssc.pipeline().addLast(new ServerHandler());
+                        ssc.pipeline()
+                                .addLast(new LifeCyCleTestHandler())
+                                .addLast(new PacketDecoder())
+                                .addLast(new LoginRequestHandler())
+                                .addLast(new MessageRequestHandler())
+                                .addLast(new PacketEncoder());
                     }
                 })
                 .bind(8000)

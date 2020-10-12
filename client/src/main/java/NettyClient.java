@@ -1,4 +1,5 @@
-import com.lhd.login.ClientHandler;
+import com.lhd.login.LoginResponseHandler;
+import com.lhd.login.MessageResponseHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -8,9 +9,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import packet.LoginUtil;
-import packet.MessageRequestPacket;
-import packet.PacketCodec;
+import packet.*;
 
 import java.util.Scanner;
 
@@ -29,7 +28,11 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new ClientHandler());
+                        ch.pipeline()
+                                .addLast(new PacketDecoder())
+                                .addLast(new LoginResponseHandler())
+                                .addLast(new MessageResponseHandler())
+                                .addLast(new PacketEncoder());
                     }
                 });
         bootstrap.connect("127.0.0.1", 8000).addListener((ChannelFutureListener) channelFuture -> {

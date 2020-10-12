@@ -29,6 +29,19 @@ public class PacketCodec {
         return buffer;
     }
 
+    public void encode(ByteBuf buffer, Packet packet){
+        // 序列化 Java 对象
+        byte[] data = Serializer.DEFAULT.serialize(packet);
+
+        // 编码
+        buffer.writeInt(MAGIC_NUMBER);
+        buffer.writeByte(packet.getVersion());
+        buffer.writeByte(Serializer.DEFAULT.getSerializerAlgorithm());
+        buffer.writeByte(packet.getCommand());
+        buffer.writeInt(data.length);
+        buffer.writeBytes(data);
+    }
+
     public Packet decode(ByteBuf byteBuf){
         // 跳过魔数
         byteBuf.skipBytes(4);
