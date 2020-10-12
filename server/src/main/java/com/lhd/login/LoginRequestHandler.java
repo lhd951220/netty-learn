@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import packet.LoginRequestPacket;
 import packet.LoginResponsePacket;
+import packet.LoginUtil;
 
 /**
  * @author Haidong Liu
@@ -12,7 +13,17 @@ import packet.LoginResponsePacket;
 public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginRequestPacket> {
     @Override
     protected void channelRead0(ChannelHandlerContext chx, LoginRequestPacket loginRequestPacket) throws Exception {
+        if(valid(loginRequestPacket)){
+            LoginUtil.markAsLogin(chx.channel());
+        } else {
+            chx.channel().close();
+            return;
+        }
         chx.channel().writeAndFlush(login(loginRequestPacket));
+    }
+
+    private boolean valid(LoginRequestPacket loginRequestPacket) {
+        return true;
     }
 
     private LoginResponsePacket login(LoginRequestPacket loginRequestPacket){

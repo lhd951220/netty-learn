@@ -37,7 +37,7 @@ public class NettyClient {
                 });
         bootstrap.connect("127.0.0.1", 8000).addListener((ChannelFutureListener) channelFuture -> {
             if(channelFuture.isSuccess()){
-                Channel channel = ((ChannelFuture) channelFuture).channel();
+                Channel channel = channelFuture.channel();
                 startConsoleThread(channel);
             } else {
                 System.out.println("客户端连接失败");

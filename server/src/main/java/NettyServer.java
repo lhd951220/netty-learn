@@ -1,7 +1,4 @@
-import com.lhd.login.LifeCyCleTestHandler;
-import com.lhd.login.LoginRequestHandler;
-import com.lhd.login.MessageRequestHandler;
-import com.lhd.login.ServerHandler;
+import com.lhd.login.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -32,6 +29,7 @@ public class NettyServer {
                                 .addLast(new LifeCyCleTestHandler())
                                 .addLast(new PacketDecoder())
                                 .addLast(new LoginRequestHandler())
+                                .addLast(new AuthHandler())
                                 .addLast(new MessageRequestHandler())
                                 .addLast(new PacketEncoder());
                     }
