@@ -1,9 +1,12 @@
 package com.lhd.login;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import packet.MessageRequestPacket;
 import packet.MessageResponsePacket;
+import packet.Session;
+import packet.SessionUtil;
 
 import java.util.Date;
 
@@ -14,7 +17,20 @@ import java.util.Date;
 public class MessageRequestHandler extends SimpleChannelInboundHandler<MessageRequestPacket> {
     @Override
     protected void channelRead0(ChannelHandlerContext chx, MessageRequestPacket messageRequestPacket) throws Exception {
-        chx.channel().writeAndFlush(receiveMessage(messageRequestPacket));
+        Session session = SessionUtil.getSession(chx.channel());
+
+        MessageResponsePacket messageResponsePacket = new MessageResponsePacket();
+        messageResponsePacket.setFromUserId(session.getUserId());
+        messageResponsePacket.setFromUsername(session.getUsername());
+        messageResponsePacket.setMessage(messageRequestPacket.getMessage());
+
+        // 拿到消息接收方的 channel
+        Channel toUserChannel = SessionUtil.getChannel(messageRequestPacket.getToUserId());
+        if(toUserChannel != null && SessionUtil.hasLogin(toUserChannel)){
+            toUserChannel.writeAndFlush(messageResponsePacket);
+        } else {
+            System.err.println("[" + messageRequestPacket.getToUserId() + "] 不在线，发送失败!");
+        }
     }
 
     private MessageResponsePacket receiveMessage(MessageRequestPacket messageRequestPacket) {

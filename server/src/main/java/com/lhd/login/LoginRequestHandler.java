@@ -2,9 +2,9 @@ package com.lhd.login;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import packet.LoginRequestPacket;
-import packet.LoginResponsePacket;
-import packet.LoginUtil;
+import packet.*;
+
+import java.util.UUID;
 
 /**
  * @author Haidong Liu
@@ -13,13 +13,18 @@ import packet.LoginUtil;
 public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginRequestPacket> {
     @Override
     protected void channelRead0(ChannelHandlerContext chx, LoginRequestPacket loginRequestPacket) throws Exception {
-        if(valid(loginRequestPacket)){
-            LoginUtil.markAsLogin(chx.channel());
-        } else {
-            chx.channel().close();
-            return;
-        }
-        chx.channel().writeAndFlush(login(loginRequestPacket));
+        LoginResponsePacket packet = new LoginResponsePacket();
+        String userId = UUID.randomUUID().toString().substring(0, 6);
+        packet.setUserId(userId);
+        packet.setSuccess(true);
+        SessionUtil.bindSession(new Session(userId, loginRequestPacket.getUsername()), chx.channel());
+
+        chx.channel().writeAndFlush(packet);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        SessionUtil.unBindSession(ctx.channel());
     }
 
     private boolean valid(LoginRequestPacket loginRequestPacket) {

@@ -1,7 +1,9 @@
 package packet;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Haidong Liu
@@ -9,7 +11,11 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MessageRequestPacket extends Packet{
+
+    private String toUserId;
 
     private String message;
 

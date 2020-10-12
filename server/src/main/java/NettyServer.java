@@ -29,7 +29,6 @@ public class NettyServer {
                                 .addLast(new LifeCyCleTestHandler())
                                 .addLast(new PacketDecoder())
                                 .addLast(new LoginRequestHandler())
-                                .addLast(new AuthHandler())
                                 .addLast(new MessageRequestHandler())
                                 .addLast(new PacketEncoder());
                     }
